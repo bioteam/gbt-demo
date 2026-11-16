@@ -1,6 +1,6 @@
 # gbt-demo
 
-A demo of gradient boosted trees on the
+A demo of gradient boosted trees using the
 [Golub et al. (1999)](https://doi.org/10.1126/science.286.5439.531) ALL/AML
 leukemia gene-expression dataset (full reference under [Data](#data)).
 
@@ -8,7 +8,7 @@ leukemia gene-expression dataset (full reference under [Data](#data)).
 
 Gradient boosted trees (GBT) make a prediction by adding up results from many small decision
 trees. The trees are built one at a time in training. Each new tree is fitted to the errors
-that the trees before it still make, and its output is scaled down by a learning
+that the trees before it make, and its output is scaled down by a learning
 rate ν before it is added. No single tree is a good classifier on its own; the
 sum is.
 
@@ -166,15 +166,12 @@ paper's own predictions.
 Golub TR et al., "Molecular Classification of Cancer: Class Discovery and Class
 Prediction by Gene Expression Monitoring", *Science* 286:531–537 (1999).
 doi:[10.1126/science.286.5439.531](https://doi.org/10.1126/science.286.5439.531).
-A copy of the paper, from the same Broad page, is in
-`docs/Golub_et_al_1999.pdf`. It is the publisher's copyrighted PDF, so it is
-gitignored; download it from
+The paper is © AAAS, so it is not included here; the Broad hosts a copy at
 <https://pubs.broadinstitute.org/mpr/projects/Leukemia/Golub_et_al_1999.pdf>.
 
 Downloaded 2026-11-16 from the Broad Institute's original publication page,
-<https://pubs.broadinstitute.org/mpr/projects/Leukemia/>, into `data/raw/`
-(checksums in `data/raw/SHA256SUMS`). The old `datasets.genepattern.org` copies
-(`all_aml_*.gct`) no longer resolve.
+<https://pubs.broadinstitute.org/mpr/projects/Leukemia/>, into `data/raw/`.
+The old `datasets.genepattern.org` copies (`all_aml_*.gct`) no longer resolve.
 
 | File | Contents |
 | --- | --- |
