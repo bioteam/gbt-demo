@@ -1,0 +1,21 @@
+[project]
+name = "gbt-demo"
+version = "0.1.0"
+description = "Gradient boosted trees explained on the Golub ALL/AML leukemia dataset"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "matplotlib>=3.8",
+    "numpy>=1.26",
+    "pandas>=2.0",
+    # The figures and the numbers in the README come from scikit-learn 1.7. Another minor
+    # version can grow different trees from the same random_state.
+    "scikit-learn>=1.7,<1.8",
+]
+
+[project.urls]
+Repository = "https://github.com/bioteam/gbt-demo"
+
+# The scripts in src/ are run directly, not installed, so there is no build backend.
+[tool.uv]
+package = false

@@ -48,6 +48,21 @@ def gene_descriptions() -> pd.Series:
     return df.set_index("Gene Accession Number")["Gene Description"]
 
 
+def paper_predictions() -> pd.DataFrame:
+    """Golub et al.'s own 50-gene predictions, from table_ALL_AML_predic.txt.
+
+    Columns: predicted (ALL/AML), strength (prediction strength, 0-1), call (True when the
+    strength reached the paper's 0.3 threshold; uncalled samples are left as uncertain).
+    """
+    rows = []
+    for line in (RAW / "table_ALL_AML_predic.txt").read_text().splitlines():
+        m = re.match(r"^\s*(\d+)\s+(?:ALL|AML)\s+(ALL|AML)\s+([\d.]+)\s+(YES|NO)\b", line)
+        if m:
+            rows.append({"sample": int(m[1]), "predicted": m[2], "strength": float(m[3]),
+                         "call": m[4] == "YES"})
+    return pd.DataFrame(rows).set_index("sample").sort_index()
+
+
 def load(split: str):
     """(X, y) for a split, with y = 1 for AML and 0 for ALL."""
     X = load_expression(split)

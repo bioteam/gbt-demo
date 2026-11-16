@@ -7,11 +7,10 @@
 
     python src/fig_single_tree.py   # writes figures/tree_{training,prediction}.{png,svg,caption.md}
 
-The model uses max_features="sqrt" so the first tree is a readable depth-2 tree. With every gene
-available, the first split (Zyxin, X95735_at) separates all 38 training samples on its own and the
-tree degenerates to a stump. min_impurity_decrease=1e-9 stops sklearn splitting already-pure nodes
-into twin leaves with identical values (float-noise gains); 1e-6 was too high and left the late
-trees, whose residuals are tiny, as single leaves.
+The model is RANDOM_GENES_MODEL from train_test.py, which explains its settings;
+python src/train_test.py --random-genes reports how well it predicts.
+min_impurity_decrease=1e-9 rather than 1e-6: 1e-6 left
+the late trees, whose residuals are tiny, as single leaves.
 """
 
 from pathlib import Path
@@ -19,13 +18,14 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import FancyBboxPatch, Rectangle
-from sklearn.ensemble import GradientBoostingClassifier
+from golub import load_labels
+from train_test import RANDOM_GENES_MODEL
+from train_test import fit as fit_model
 
-from golub import load, load_labels
-
-SEED = 203            # chosen so tree 1 has two mixed children and four leaves of n >= 3
+# Seed 203: tree 1 has two mixed children and four leaves of n >= 3.
+SEED = RANDOM_GENES_MODEL["random_state"]
 EXAMPLE = 51          # test sample traced through the tree
-NU = 0.1              # learning rate
+NU = RANDOM_GENES_MODEL["learning_rate"]
 OUT = Path(__file__).resolve().parent.parent / "figures"
 
 # Gene symbols for the probes this seed's tree uses; any other probe is shown by its ID.
@@ -40,6 +40,7 @@ plt.rcParams.update({
     "font.family": ["Arial", "DejaVu Sans"],
     "mathtext.fontset": "dejavusans",
     "svg.fonttype": "none",
+    "svg.hashsalt": "gbt-demo",  # fixed clip-path IDs, so regenerated SVGs only differ when content does
 })
 
 # Geometry, in inches, shared by both figures so they line up when flipped between on a slide.
@@ -54,12 +55,7 @@ def symbol(probe):
 # ---- model and numbers ---------------------------------------------------------------------------
 
 def fit():
-    Xtr, ytr = load("train")
-    Xte, _ = load("test")
-    model = GradientBoostingClassifier(
-        n_estimators=100, max_depth=2, learning_rate=NU, max_features="sqrt",
-        min_impurity_decrease=1e-9, random_state=SEED,
-    ).fit(Xtr, ytr)
+    model, Xtr, ytr, Xte, _ = fit_model(RANDOM_GENES_MODEL)
     return model, Xtr, ytr, Xte
 
 
@@ -228,7 +224,8 @@ def save(fig, name, caption):
     """Write <name>.png/.svg (no title in the image) and <name>.caption.md beside them."""
     OUT.mkdir(exist_ok=True)
     for ext in ("png", "svg"):
-        fig.savefig(OUT / f"{name}.{ext}", dpi=200, facecolor=C["surface"], bbox_inches="tight", pad_inches=0.2)
+        fig.savefig(OUT / f"{name}.{ext}", dpi=200, facecolor=C["surface"], bbox_inches="tight", pad_inches=0.2,
+                    metadata={"Date": None})
     (OUT / f"{name}.caption.md").write_text(caption + "\n")
     plt.close(fig)
     print("wrote", OUT / f"{name}.png")
