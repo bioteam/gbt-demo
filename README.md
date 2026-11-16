@@ -183,7 +183,7 @@ Downloaded 2026-11-16 from the Broad Institute's original publication page,
 | `table_ALL_AML_samples.txt` | Per-sample labels: ALL/AML, BM/PB, T/B-cell, FAB, source lab |
 | `table_ALL_AML_predic.txt` | The paper's own predictions, for comparison |
 | `table_ALL_AML_rfactors.txt` | Per-chip intensity re-scaling factors |
-| `Files_descriptions.txt`, `Experimental_protocol.html` | Broad's notes on the files and protocol |
+| `Files_descriptions.txt` | Broad's notes on the files |
 
 ### Format notes
 
