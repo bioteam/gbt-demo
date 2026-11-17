@@ -6,25 +6,26 @@ leukemia gene-expression dataset (full reference under [Data](#data)).
 
 ## What is GBT?
 
-Gradient boosted trees (GBT) make a prediction by adding up results from many small decision
+Gradient boosted trees (GBT) make predictions by adding up results from many small decision
 trees. The trees are built one at a time in training. Each new tree is fitted to the errors
 that the trees before it make, and its output is scaled down by a learning
 rate ν before it is added. No single tree is a good classifier on its own; the
 sum is.
 
-**Boosting** means combining many weak models, each only a little better than
-guessing, into one strong model. The name comes from the original question in
+**Boosting** means combining many weak models, each contributng a partial finding, into one strong model. The name comes from the original question in
 machine-learning theory: can a weak learner's accuracy be *boosted* to any level
-you want? Schapire showed that it can[^schapire]. The answer is to train the
-models in sequence and have each one concentrate on what the earlier ones got
+you want? Schapire showed that it can[^schapire]. The solution is to train the
+models in sequence and have each one focus on what the earlier ones got
 wrong. **Gradient** says how "got wrong" is measured. Each tree is fitted to the
 gradient of the loss, the direction that most reduces the error. For this
-classifier that gradient is simply the residual $y - p$, so each tree learns
-what is left over. **Trees** says what the weak models are: small decision trees.
+classifier that gradient is the residual $y - p$, so each tree learns
+what is left over.
 
 [^schapire]: Schapire RE, "The Strength of Weak Learnability", *Machine
     Learning* 5(2):197–227 (1990).
     doi:[10.1007/BF00116037](https://doi.org/10.1007/BF00116037).
+
+### The biological problem
 
 Here the task is binary: is a leukemia sample ALL or AML? Each sample is one
 patient's expression profile, and each of the 7,071 probe sets is a feature. The
@@ -70,7 +71,7 @@ P = 0.37.
 
 ![Test sample 51 run through all 100 trees, with the outputs summed](figures/tree_ensemble.png)
 
-The real prediction runs the sample through all 100 trees and adds up their
+The complete prediction runs the sample through all 100 trees and adds up their
 outputs. Top: the sum written out, each tree drawn with the sample's path. Bottom:
 every tree's step as a waterfall. 78 trees push sample 51 toward AML and 22
 toward ALL; the total ends at F = 6.00, P(AML) = 0.998. The steps shrink as the
@@ -102,7 +103,7 @@ the random-genes model is the one drawn in the figures above.
 | Test ROC AUC | 0.914 | 0.993 | 0.993 | — |
 | Genes that affect the output | 1: Zyxin, in all 100 trees | 153 | 33 | 50 |
 
-All three GBT models fit the 38 training samples perfectly, so the test set is
+All three GBT models fit the 38 training samples correctly, so the test set is
 what tells them apart. The paper only calls a sample when its prediction
 strength is 0.3 or more: that way it called 29 of the 34 test samples, all of
 them correctly, and left 5 uncertain (54, 57, 60, 66, 67).
@@ -119,17 +120,16 @@ them correctly, and left 5 uncertain (54, 57, 60, 66, 67).
   settings were chosen by repeated 5-fold cross-validation on the training set
   only, from 96 combinations of tree depth, genes per split, row subsampling,
   learning rate and gene prefilter; the test set played no part. Four things
-  helped: stumps, which make the model a sum of single-gene votes like the
+  helped: minimal trees, which make the model a sum of single-gene votes like the
   paper's; a random subset of genes at each split; the paper's 50-gene
   prefilter, refitted inside each cross-validation fold; and a smaller learning
   rate with more trees. Its result depends on the random seed, so the script
-  runs 20 seeds and reports all of them. Six of its ten most important genes, Zyxin, CD33, the
-  leptin receptor, E2A (TCF3), c-MYB and cyclin D3, are ones the paper names
+  runs 20 seeds and reports all of them. Six of its ten most important genes, Zyxin, CD33, the leptin receptor, E2A (TCF3), c-MYB and cyclin D3, are ones the paper names
   among its informative genes.
 
 **Why no setting does better than the paper.** Every training AML sample came
 from CALGB, and every training ALL sample from DFCI, so the training set
-confounds class with lab. The errors left in the tuned model are AML samples
+matches class with lab. The errors left in the tuned model are AML samples
 from labs that sent no AML to the training set: 61 (St. Jude) and 66 (CCG) in
 every seed, and 60 (St. Jude) in 40% of seeds. The model still ranks them
 almost correctly, but its probabilities shift for samples from labs it has not
@@ -138,11 +138,6 @@ correctly; the GBT is confidently wrong on both. The GBT gets 67 right, which
 the paper gets wrong.
 
 ### Running the code
-
-Dependencies are in `pyproject.toml`: scikit-learn 1.7, pandas, numpy and
-matplotlib, on Python 3.10 or later. scikit-learn is held to 1.7 because another
-version can grow different trees and change the numbers above. With
-[uv](https://docs.astral.sh/uv/), from the repository root:
 
 ```sh
 uv run python src/train_test.py                 # train, test, compare with the paper
@@ -190,8 +185,5 @@ The old `datasets.genepattern.org` copies (`all_aml_*.gct`) no longer resolve.
   (P/A/M, present/absent/marginal). Drop the `call` columns to get the matrix.
 - Sample columns are **not** in numeric order (e.g. train runs 1–27, 34–38,
   28–33), so join to labels by sample number, not by position.
-- Data rows end with a trailing tab. In pandas use
-  `pd.read_csv(path, sep="\t", index_col=False)`. Otherwise the first column is
-  silently taken as the index and every column shifts by one.
 - Class labels are not in the expression files; take them from
   `table_ALL_AML_samples.txt` (samples 1–38 train, 39–72 test).
