@@ -60,6 +60,10 @@ log-odds of AML.
 
 ### Prediction with one tree
 
+Each internal node is a split prediction where a given value from the test sample is 
+evaluated according to a simple formula containing a gene and a gene-expression value
+for that gene.
+
 ![Test sample 51 dropped through tree 1](figures/tree_prediction.png)
 
 Test sample 51 (AML), which the model never saw in training, dropped through the
