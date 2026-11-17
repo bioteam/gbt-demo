@@ -97,7 +97,7 @@ the random-genes model is the one drawn in the figures above.
 
 | | Default model | Random-genes model (`--random-genes`) | Tuned model (`--tuned`) | The paper |
 | --- | --- | --- | --- | --- |
-| Settings | 100 trees, depth 2, ν = 0.1, every gene available at each split | the same, but a random 84 genes (`max_features="sqrt"`) at each split, `random_state=203` | keep the 50 genes with the best signal-to-noise, then 300 stumps (depth 1), ν = 0.05, a random 7 genes at each split | 50 genes by signal-to-noise, each casting a weighted vote |
+| Settings | 100 trees, depth 2, ν = 0.1, every gene available at each split | the same, but a random 84 genes (`max_features="sqrt"`) at each split, `random_state=203` | keep the 50 genes with the best signal-to-noise, then 300 depth-1 trees, ν = 0.05, a random 7 genes at each split | 50 genes by signal-to-noise, each casting a weighted vote |
 | Test errors | 3 / 34 (66, 67, 68) | 7 / 34, all AML called ALL | 2 / 34 in 12 of 20 seeds, 3 in 7, 4 in 1 | 2 / 34 if made to call every sample (66, 67) |
 | Test log-loss | 0.94 | 0.56 | 0.29 (mean over seeds) | — |
 | Test ROC AUC | 0.914 | 0.993 | 0.993 | — |
